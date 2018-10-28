@@ -17,7 +17,7 @@ users.use(bodyParser.json());
 
 users.post("/create", (request, response) => { //tem erros de eslint fix later just a sample of the real code to gain time =)
     const user = request.body.user;
-    const ref = FBdb.ref("users").push();
+    const ref = FBdb.ref("users/" + user.cpf)
     let exist = true;
     FBdb.ref("users").once("value").then(usr => {
         if (usr)
@@ -35,10 +35,17 @@ users.post("/create", (request, response) => { //tem erros de eslint fix later j
 });
 
 users.post("/login", (request, response) => {
-    const id = request.body.id;
-    const ref = FBdb.ref("users/" + id + "/log").push();
-    ref.set({ quando: new Date().toLocaleString() })
-        .then(() => response.status(200).send({ msg: "Sucesso" }))
+    const cpf = request.body.cpf;
+    let test = false;
+    FBdb.ref("users").once("value")
+        .then(usr => {
+            if (usr && Object.keys(usr.val()).includes(cpf)) {
+                FBdb.ref("users/" + cpf + "/log").push({ quando: new Date().toLocaleString() });
+                test = true;
+            }
+            return true;
+        })
+        .then(() => test ? response.status(200).send({ msg: "ok" }) : response.status(401).send({ msg: "not ok" }))
         .catch(err => response.status(500).send({ err }));
 });
 
