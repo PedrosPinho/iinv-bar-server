@@ -16,7 +16,14 @@ users.use(bodyParser.urlencoded({ extended: false }));
 users.use(bodyParser.json());
 
 users.post("/create", (request, response) => { //tem erros de eslint fix later just a sample of the real code to gain time =)
-    const user = request.body.user;
+    const user = {
+        cpf: request.body.cpf,
+        nome: request.body.nome,
+        type: request.body.type,
+        email: request.body.email ? request.body.email : null,
+        funcao: request.body.funcao ? request.body.funcao : null,
+        inicio: request.body.inicio ? request.body.inicio : null
+    };
     const ref = FBdb.ref("users/" + user.cpf)
     let exist = true;
     FBdb.ref("users").once("value").then(usr => {
@@ -26,11 +33,14 @@ users.post("/create", (request, response) => { //tem erros de eslint fix later j
             });
         return true;
     }).then(() => {
+        console.log(user)
         if (exist)
             ref.set(user);
         return true;
     })
-        .then(() => response.status(200).send({ msg: !exist ? "CPF ja cadastrado" : "Usuario criado" }))
+        .then(() => !exist ?
+            response.status(401).send({ msg: "CPF ja cadastrado" }) :
+            response.status(200).send({ msg: "Usuario criado" }))
         .catch(err => response.status(500).send({ err }));
 });
 
