@@ -85,6 +85,7 @@ users.get("/:usrId", (request, response) => {
             delete resp['log'];
             console.log(resp);
             response.status(200).send(resp)
+            return true;
         })
         .catch(err => response.status(500).send({ err }));
 });
