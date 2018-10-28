@@ -15,7 +15,7 @@ users.use(bodyParser.urlencoded({ extended: false }));
 // parse application/json
 users.use(bodyParser.json());
 
-users.post("/create", (request, response) => { //tem erros de eslint fix later just a sample of the real code to gain time =)
+users.post("/create", (request, response) => {
     const user = {
         cpf: request.body.cpf,
         nome: request.body.nome,
@@ -33,9 +33,10 @@ users.post("/create", (request, response) => { //tem erros de eslint fix later j
             });
         return true;
     }).then(() => {
-        console.log(user)
-        if (exist)
+        if (exist) {
             ref.set(user);
+            console.log("Criando usuario! " + user.cpf)
+        }
         return true;
     })
         .then(() => !exist ?
@@ -49,7 +50,8 @@ users.post("/login", (request, response) => {
     let test = false;
     FBdb.ref("users").once("value")
         .then(usr => {
-            if (usr && Object.keys(usr.val()).includes(cpf)) {
+            if (usr && Object.keys(usr.val()).includes(cpf) && usr.val()[cpf].type === "funcionario") {
+                console.log(cpf + " Logado com sucesso")
                 FBdb.ref("users/" + cpf + "/log").push({ quando: new Date().toLocaleString() });
                 test = true;
             }
@@ -61,6 +63,7 @@ users.post("/login", (request, response) => {
 
 users.post("/alter", (request, response) => {
     const user = request.body.user;
+    console.log("Alterando usuario");
     FBdb.ref("users/" + user.id)
         .update({ user })
         .then(() => response.status(200).send({ msg: "Sucesso" }))
@@ -69,11 +72,22 @@ users.post("/alter", (request, response) => {
 
 users.delete("/remove", (request, response) => {
     const id = request.body.id;
+    console.log("Deletando usuario");
     FBdb.ref("users/" + id)
         .then(() => response.status(200).send({ msg: "Sucesso" }))
         .catch(err => response.status(500).send({ err }));
 });
 
+users.get("/:usrId", (request, response) => {
+    FBdb.ref("users/" + request.params.usrId).once("value")
+        .then(clientSnap =>{ 
+            let resp = clientSnap.val();
+            delete resp['log'];
+            console.log(resp);
+            response.status(200).send(resp)
+        })
+        .catch(err => response.status(500).send({ err }));
+});
 
 users.get("/", (request, response) => {
     FBdb.ref("users").once("value")
