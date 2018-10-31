@@ -17,8 +17,13 @@ cardapio.use(bodyParser.urlencoded({ extended: false }));
 cardapio.use(bodyParser.json());
 
 cardapio.post("/create", (request, response) => {
-    const item = request.body.item;
     const ref = FBdb.ref("cardapio").push();
+    const item = {
+        nome: request.body.nome,
+        preco: request.body.preco,
+        descricao: request.body.descricao,
+        id: ref.key
+    };
     ref.set(item)
         .then(() => response.status(200).send({ msg: "Item adcionado" }))
         .catch(err => response.status(500).send({ err }));
@@ -40,7 +45,15 @@ cardapio.delete("/remove", (request, response) => {
 
 cardapio.get("/", (request, response) => {
     FBdb.ref("cardapio").once("value")
-        .then(clientSnap => response.status(200).send(clientSnap.val()))
+        .then(clientSnap => {
+            let list = [];
+            clientSnap.forEach(a => { 
+                list.push(a.val());
+            });
+            console.log(list);
+            response.status(200).send(list)
+            return true;
+        })
         .catch(err => response.status(500).send({ err }));
 });
 
