@@ -21,8 +21,7 @@ cardapio.post("/create", (request, response) => {
     const item = {
         nome: request.body.nome,
         preco: request.body.preco,
-        descricao: request.body.descricao,
-        id: ref.key
+        descricao: request.body.descricao
     };
     ref.set(item)
         .then(() => response.status(200).send({ msg: "Item adcionado" }))
