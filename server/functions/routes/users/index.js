@@ -20,6 +20,7 @@ users.post("/create", (request, response) => {
         cpf: request.body.cpf,
         nome: request.body.nome,
         type: request.body.type,
+        frequencia: request.body.type === "cliente" ? 0 : null,
         email: request.body.email ? request.body.email : null,
         funcao: request.body.funcao ? request.body.funcao : null,
         inicio: request.body.inicio ? request.body.inicio : null
@@ -80,7 +81,7 @@ users.delete("/remove", (request, response) => {
 
 users.get("/:usrId", (request, response) => {
     FBdb.ref("users/" + request.params.usrId).once("value")
-        .then(clientSnap =>{ 
+        .then(clientSnap => {
             let resp = clientSnap.val();
             delete resp['log'];
             console.log(resp);
@@ -94,6 +95,52 @@ users.get("/", (request, response) => {
     FBdb.ref("users").once("value")
         .then(clientSnap => response.status(200).send(clientSnap.val()))
         .catch(err => response.status(500).send({ err }));
+});
+
+users.post("/funcionario", (request, response) => {
+    FBdb.ref("users").once("value")
+        .then(clientSnap => {
+            let list = [];
+            clientSnap.forEach(c => {
+                console.log(c.val());
+                if (c.val().type !== "cliente") {
+                    list.push({ 
+                        cpf: c.val().cpf,
+                        email: c.val().email,
+                        nome: c.val().nome,
+                        inicio: c.val().inicio,
+                        funcao: c.val().funcao,
+                        telefone: c.val().telefone ? c.val().telefone : null,
+                     });
+                }
+                return false;
+            })
+            response.status(200).send(list)
+            return true;
+        })
+        .catch(err => response.status(500).send({ err }));
+});
+
+users.post("/client", (request, response) => {
+    FBdb.ref("users").once("value")
+        .then(clientSnap => {
+            let list = [];
+            clientSnap.forEach(c => {
+                console.log(c.val());
+                if (c.val().type === "cliente") {
+                    list.push({ 
+                        cpf: c.val().cpf,
+                        email: c.val().email,
+                        nome: c.val().nome,
+                        frequencia: c.val().frequencia,
+                        telefone: c.val().telefone ? c.val().telefone : null,
+                     });
+                }
+                return false;
+            });
+            response.status(200).send(list)
+            return true;
+        }).catch(() => response.status(500).send({ msg: "ERRO" }));
 });
 
 
