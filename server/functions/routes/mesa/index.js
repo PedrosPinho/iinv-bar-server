@@ -18,17 +18,21 @@ mesa.use(bodyParser.json());
 
 mesa.post("/add/:nMesa", (request, response) => {
     const item = request.body.item; // {id preco nome qtd}
-    const ref = FBdb.ref("mesa/" + request.params.nMesa + "/produtos/" + item.id);
+    const ref = FBdb.ref("mesas/" + request.params.nMesa + "/produtos/" + item.id);
     ref.set(item)
         .then(() => response.status(200).send({ msg: "Item adcionado" }))
         .catch(err => response.status(500).send({ err }));
 });
 
+//ta errado
 mesa.delete("/remove/:nMesa/:idProd", (request, response) => {
-    const ref = FBdb.ref("mesa/" + request.params.nMesa + "/produtos/" + request.params.idProd);
+    const ref = FBdb.ref("mesas/" + request.params.nMesa + "/produtos/" + request.params.idProd);
     let test = true;
+    let quantidade;
     ref.once("value").then(prod => {
+        console.log(prod.val().quantidade === "1");
         if (prod.val().quantidade === 1) test = false;
+        quantidade = prod.val().quantidade - 1;
         return true;
     }).catch(err => response.status(500).send({ err }));
     if (!test) ref.remove();
