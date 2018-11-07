@@ -25,10 +25,13 @@ mesa.post("/add/:nMesa", (request, response) => {
             if (prods.val()[item.id]) {
                 produto = prods.val()[item.id];
                 produto.quantidade = produto.quantidade + 1;
+                console.log(produto);
             }
             return true;
-        }).catch(err => response.status(500).send({ err }));
-    ref.set(produto)
+        }).then(() => {
+            ref.set(produto);
+            return true;
+        })
         .then(() => response.status(200).send({ msg: "Item adcionado" }))
         .catch(err => response.status(500).send({ err }));
 });
@@ -42,13 +45,12 @@ mesa.delete("/remove/:nMesa/:idProd", (request, response) => {
         produto = prod.val();
         produto.quantidade = produto.quantidade - 1;
         return true;
-    }).catch(err => response.status(500).send({ err }));
-    if (produto.quantidade === 0) ref.remove();
-    else ref.update(produto)
-        .then(() => response.status(200).send({ msg: "Item removido" }))
-        .catch(err => response.status(500).send({ err }));
-
-
+    }).then(() => {
+        if (produto.quantidade === 0) ref.remove();
+        else ref.update(produto)
+        return true;
+    }).then(() => response.status(200).send({ msg: "Item removido" }))
+    .catch(err => response.status(500).send({ err }));
 });
 
 mesa.get("/", (request, response) => {
