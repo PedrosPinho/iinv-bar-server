@@ -1,13 +1,26 @@
 const express = require("express");
+const schedule = require("node-schedule");
 const cors = require("cors");
 const bodyParser = require("body-parser");
 const { FBdb } = require("../../firebase");
 //Routes handle requests 
 
-const fetch = require('node-fetch');
 
 // Express instance
 const users = express();
+
+const testeSchedule = schedule.scheduledJob("*/1 * * * * *", () => {
+    console.log("eh pra funcionar porra");
+});
+
+const jobCreated = schedule.scheduleJob("* * */1 * * *", () => {
+    console.log("teste * * */1 * * * " + new Date());
+
+});
+
+const joAbPending0 = schedule.scheduleJobs("00 00 13 * * 1-5", () => {
+    console.log("teste S 00 00 13 * * 1-5 " + new Date());
+});
 
 // parse application/x-www-form-urlencoded
 users.use(bodyParser.urlencoded({ extended: false }));
@@ -104,14 +117,14 @@ users.post("/funcionario", (request, response) => {
             clientSnap.forEach(c => {
                 console.log(c.val());
                 if (c.val().type !== "cliente") {
-                    list.push({ 
+                    list.push({
                         cpf: c.val().cpf,
                         email: c.val().email,
                         nome: c.val().nome,
                         inicio: c.val().inicio,
                         funcao: c.val().funcao,
                         telefone: c.val().telefone ? c.val().telefone : null,
-                     });
+                    });
                 }
                 return false;
             })
@@ -128,13 +141,13 @@ users.post("/client", (request, response) => {
             clientSnap.forEach(c => {
                 console.log(c.val());
                 if (c.val().type === "cliente") {
-                    list.push({ 
+                    list.push({
                         cpf: c.val().cpf,
                         email: c.val().email,
                         nome: c.val().nome,
                         frequencia: c.val().frequencia,
                         telefone: c.val().telefone ? c.val().telefone : null,
-                     });
+                    });
                 }
                 return false;
             });
