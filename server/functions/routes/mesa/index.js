@@ -36,6 +36,10 @@ mesa.post("/add/:nMesa", (request, response) => {
         .catch(err => response.status(500).send({ err }));
 });
 
+mesa.post("/sell/:nMesa", (request, response) => {
+    
+});
+
 //ta errado
 mesa.delete("/remove/:nMesa/:idProd", (request, response) => {
     const ref = FBdb.ref("mesas/" + request.params.nMesa + "/produtos/" + request.params.idProd);
@@ -50,12 +54,15 @@ mesa.delete("/remove/:nMesa/:idProd", (request, response) => {
         else ref.update(produto)
         return true;
     }).then(() => response.status(200).send({ msg: "Item removido" }))
-    .catch(err => response.status(500).send({ err }));
+        .catch(err => response.status(500).send({ err }));
 });
 
 mesa.get("/", (request, response) => {
-    FBdb.ref("mesa").once("value")
-        .then(clientSnap => response.status(200).send(clientSnap.val()))
+    FBdb.ref("mesas").once("value")
+        .then(clientSnap => {
+            response.status(200).send(clientSnap.val())
+            return true;
+        })
         .catch(err => response.status(500).send({ err }));
 });
 

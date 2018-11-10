@@ -9,18 +9,18 @@ const { FBdb } = require("../../firebase");
 // Express instance
 const users = express();
 
-const testeSchedule = schedule.scheduledJob("*/1 * * * * *", () => {
-    console.log("eh pra funcionar porra");
-});
+// const testeSchedule = schedule.scheduledJob("*/1 * * * * *", () => {
+//     console.log("eh pra funcionar porra");
+// });
 
-const jobCreated = schedule.scheduleJob("* * */1 * * *", () => {
-    console.log("teste * * */1 * * * " + new Date());
+// const jobCreated = schedule.scheduleJob("* * */1 * * *", () => {
+//     console.log("teste * * */1 * * * " + new Date());
 
-});
+// });
 
-const joAbPending0 = schedule.scheduleJobs("00 00 13 * * 1-5", () => {
-    console.log("teste S 00 00 13 * * 1-5 " + new Date());
-});
+// const joAbPending0 = schedule.scheduleJobs("00 00 13 * * 1-5", () => {
+//     console.log("teste S 00 00 13 * * 1-5 " + new Date());
+// });
 
 // parse application/x-www-form-urlencoded
 users.use(bodyParser.urlencoded({ extended: false }));
