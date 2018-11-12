@@ -18,14 +18,18 @@ mesa.use(bodyParser.json());
 
 mesa.post("/add/:nMesa", (request, response) => {
     let produto;
-    const item = request.body.item; // {id preco nome qtd}
+    const item = request.body.item; // {id preco nome qtd
     const ref = FBdb.ref("mesas/" + request.params.nMesa + "/produtos/" + item.id);
     FBdb.ref("mesas/" + request.params.nMesa + "/produtos").once("value")
         .then(prods => {
+            console.log(produto);
             if (prods.val()[item.id]) {
                 produto = prods.val()[item.id];
                 produto.quantidade = produto.quantidade + 1;
                 console.log(produto);
+            } else {
+                produto = item;
+                produto.quantidade = request.body.quantidade;
             }
             return true;
         }).then(() => {
@@ -37,7 +41,12 @@ mesa.post("/add/:nMesa", (request, response) => {
 });
 
 mesa.post("/sell/:nMesa", (request, response) => {
-    
+    const cpf = request.body.cpf;
+    FBdb.ref("users/" + cpf + "/vendas").push({ quando: new Date().toLocaleString() });
+
+    FBdb.ref("mesas/" + request.params.nMesa + "/produtos").remove()
+        .then(() => response.status(200).send({ msg: "Item adcionado" }))
+        .catch(err => response.status(500).send({ err }));
 });
 
 //ta errado
@@ -61,6 +70,21 @@ mesa.get("/", (request, response) => {
     FBdb.ref("mesas").once("value")
         .then(clientSnap => {
             response.status(200).send(clientSnap.val())
+            return true;
+        })
+        .catch(err => response.status(500).send({ err }));
+});
+
+mesa.get("/itens/:mesa", (request, response) => {
+    FBdb.ref("mesas/" + request.params.mesa + "/produtos").once("value")
+        .then(clientSnap => {
+            console.log("A")
+            let list = [];
+            clientSnap.forEach(element => {
+                console.log(element.val());
+                list.push(element.val());
+            });
+            response.status(200).send(list);
             return true;
         })
         .catch(err => response.status(500).send({ err }));
