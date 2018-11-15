@@ -88,6 +88,7 @@ users.delete("/remove", (request, response) => {
     const id = request.body.id;
     console.log("Deletando usuario");
     FBdb.ref("users/" + id)
+        .remove()
         .then(() => response.status(200).send({ msg: "Sucesso" }))
         .catch(err => response.status(500).send({ err }));
 });
