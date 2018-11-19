@@ -76,10 +76,16 @@ users.post("/login", (request, response) => {
 });
 
 users.post("/alter", (request, response) => {
-    const user = request.body.user;
+    const user = {
+        cpf: request.body.cpf,
+        nome: request.body.nome,
+        email: request.body.email ? request.body.email : null,
+        funcao: request.body.funcao ? request.body.funcao : null,
+        inicio: request.body.inicio ? request.body.inicio : null
+    };
     console.log("Alterando usuario");
-    FBdb.ref("users/" + user.id)
-        .update({ user })
+    FBdb.ref("users/" + user.cpf)
+        .update(user)
         .then(() => response.status(200).send({ msg: "Sucesso" }))
         .catch(err => response.status(500).send({ err }));
 });

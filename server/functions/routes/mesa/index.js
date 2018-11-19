@@ -49,6 +49,25 @@ mesa.post("/sell/:nMesa", (request, response) => {
         .catch(err => response.status(500).send({ err }));
 });
 
+mesa.post("/fidelidade", (request, response) => {
+    const desconto = request.body.desconto;
+    const frequencia = request.body.frequencia;
+    let len;
+    const ref = FBdb.ref("fidelidade");
+    ref
+        .once("value").then(f => {
+            len = f.val() ? f.val().length : -1;
+            return true;
+        })
+        .then(() => {
+            FBdb.ref("fidelidade/" + (len)).set({ desconto, frequencia })
+            console.log("Desconto criado");
+            return true;
+        })
+        .then(() => response.status(200).send({ msg: "Item adcionado" }))
+        .catch(err => response.status(500).send({ err }));
+});
+
 //ta errado
 mesa.delete("/remove/:nMesa/:idProd", (request, response) => {
     const ref = FBdb.ref("mesas/" + request.params.nMesa + "/produtos/" + request.params.idProd);
@@ -63,6 +82,18 @@ mesa.delete("/remove/:nMesa/:idProd", (request, response) => {
         else ref.update(produto)
         return true;
     }).then(() => response.status(200).send({ msg: "Item removido" }))
+        .catch(err => response.status(500).send({ err }));
+});
+
+mesa.get("/fidelidade", (request, response) => {
+    FBdb.ref("fidelidade").once("value")
+        .then(clientSnap => {
+            console.log()
+            let list = [];
+            list.push(clientSnap.val()[clientSnap.val().length-1]);
+            response.status(200).send(list);
+            return true;
+        })
         .catch(err => response.status(500).send({ err }));
 });
 
