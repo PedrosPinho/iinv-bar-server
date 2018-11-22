@@ -18,7 +18,12 @@ mesa.use(bodyParser.json());
 
 mesa.post("/add/:nMesa", (request, response) => {
     let produto;
-    const item = request.body.item; // {id preco nome qtd
+    const item = {
+        id: request.body.id,
+        preco: request.body.preco,
+        descricao: request.body.descricao,
+        nome: request.body.nome
+    }
     const ref = FBdb.ref("mesas/" + request.params.nMesa + "/produtos/" + item.id);
     FBdb.ref("mesas/" + request.params.nMesa + "/produtos").once("value")
         .then(prods => {
@@ -90,7 +95,7 @@ mesa.get("/fidelidade", (request, response) => {
         .then(clientSnap => {
             console.log()
             let list = [];
-            list.push(clientSnap.val()[clientSnap.val().length-1]);
+            list.push(clientSnap.val()[clientSnap.val().length - 1]);
             response.status(200).send(list);
             return true;
         })
