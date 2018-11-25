@@ -27,8 +27,7 @@ mesa.post("/add/:nMesa", (request, response) => {
     const ref = FBdb.ref("mesas/" + request.params.nMesa + "/produtos/" + item.id);
     FBdb.ref("mesas/" + request.params.nMesa + "/produtos").once("value")
         .then(prods => {
-            console.log(produto);
-            if (prods.val()[item.id]) {
+            if (prods.val() && prods.val()[item.id]) {
                 produto = prods.val()[item.id];
                 produto.quantidade = produto.quantidade + 1;
                 console.log(produto);
