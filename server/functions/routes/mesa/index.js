@@ -47,6 +47,17 @@ mesa.post("/add/:nMesa", (request, response) => {
 mesa.post("/sell/:nMesa", (request, response) => {
     const cpf = request.body.cpf;
     FBdb.ref("users/" + cpf + "/vendas").push({ quando: new Date().toLocaleString() });
+    FBdb.ref("users/" + cpf).once("value").then(user => {
+        let freq;
+        if (user.val().frequencia) freq += user.val().frequencia;
+        else freq = 1;
+        return freq;
+    }).
+    then(freq => {
+        FBdb.ref("users/" + cpf + "/frequencia").set(freq);
+        return true;
+    })
+        .catch(err => response.status(500).send({ err }));
 
     FBdb.ref("mesas/" + request.params.nMesa + "/produtos").remove()
         .then(() => response.status(200).send({ msg: "Item adcionado" }))
